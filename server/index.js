@@ -18,7 +18,11 @@ app.use(express.json())
 
 // Serve uploaded images
 const uploadsDir = join(__dirname, 'uploads')
-if (!existsSync(uploadsDir)) mkdirSync(uploadsDir, { recursive: true })
+try {
+  if (!existsSync(uploadsDir)) mkdirSync(uploadsDir, { recursive: true })
+} catch (e) {
+  console.log('Uploads dir warning:', e.message)
+}
 app.use('/uploads', express.static(uploadsDir))
 
 // Multer storage for image uploads
@@ -31,17 +35,32 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } })
 
+// In-memory fallback cache for Vercel read-only environment
+const MEMORY_CACHE = {}
+
 // ── Data Helpers ───────────────────────────────────────────────────────────
 const DATA_DIR = join(__dirname, 'data')
 
 function readJSON(filename) {
+  if (MEMORY_CACHE[filename]) return MEMORY_CACHE[filename]
   const filepath = join(DATA_DIR, filename)
-  if (!existsSync(filepath)) return filename.includes('treatments') ? { skin: [], hair: [], makeup: [] } : []
-  return JSON.parse(readFileSync(filepath, 'utf-8'))
+  try {
+    if (!existsSync(filepath)) return filename.includes('treatments') ? { skin: [], hair: [], makeup: [] } : []
+    const data = JSON.parse(readFileSync(filepath, 'utf-8'))
+    MEMORY_CACHE[filename] = data
+    return data
+  } catch (e) {
+    return filename.includes('treatments') ? { skin: [], hair: [], makeup: [] } : []
+  }
 }
 
 function writeJSON(filename, data) {
-  writeFileSync(join(DATA_DIR, filename), JSON.stringify(data, null, 2), 'utf-8')
+  MEMORY_CACHE[filename] = data
+  try {
+    writeFileSync(join(DATA_DIR, filename), JSON.stringify(data, null, 2), 'utf-8')
+  } catch (e) {
+    console.log('Vercel read-only storage fallback active:', e.message)
+  }
 }
 
 // ── Simple Auth ────────────────────────────────────────────────────────────
@@ -321,4 +340,4 @@ if (!process.env.VERCEL) {
   })
 }
 
-module.exports = app
+export default app

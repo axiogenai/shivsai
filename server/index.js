@@ -313,8 +313,12 @@ app.get('/api/stats', authMiddleware, (req, res) => {
 })
 
 // ── Start Server ───────────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`✅ Shivsai 360 API Server running at http://localhost:${PORT}`)
-  console.log(`📂 Data directory: ${DATA_DIR}`)
-  console.log(`📸 Uploads directory: ${uploadsDir}`)
-})
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`✅ Shivsai 360 API Server running at http://localhost:${PORT}`)
+    console.log(`📂 Data directory: ${DATA_DIR}`)
+    console.log(`📸 Uploads directory: ${uploadsDir}`)
+  })
+}
+
+module.exports = app

@@ -256,14 +256,26 @@ export default function ResultsBookingPage() {
     return Object.keys(newErrors).length === 0
   }
 
+  const scrollToBooking = () => {
+    setTimeout(() => {
+      const el = document.getElementById('booking')
+      if (el) {
+        const y = el.getBoundingClientRect().top + window.scrollY - 70
+        window.scrollTo({ top: y, behavior: 'smooth' })
+      }
+    }, 50)
+  }
+
   const handleNext = () => {
     if (validateStep(step)) {
       setStep((prev) => prev + 1)
+      scrollToBooking()
     }
   }
 
   const handleBack = () => {
     setStep((prev) => prev - 1)
+    scrollToBooking()
   }
 
   const handleConfirm = async (e) => {
@@ -284,6 +296,7 @@ export default function ResultsBookingPage() {
       } finally {
         setSubmitting(false)
         setIsSubmitted(true)
+        scrollToBooking()
       }
     }
   }
@@ -516,41 +529,87 @@ export default function ResultsBookingPage() {
               <div className="bg-white/75 backdrop-blur-xl border border-white/80 rounded-3xl p-6 md:p-10 shadow-xl shadow-black/5 min-h-[460px] flex flex-col justify-between">
                 
                 {isSubmitted ? (
-                  // Success State
-                  <div className="text-center py-12 my-auto">
-                    <div className="w-16 h-16 bg-[#ffdea5]/40 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <span className="material-symbols-outlined text-[#775a19] text-[36px]">check_circle</span>
+                  // Luxury Verification Pass Card
+                  <div className="py-4">
+                    <div className="text-center mb-6">
+                      <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/30 rounded-full flex items-center justify-center mx-auto mb-3 shadow-md">
+                        <span className="material-symbols-outlined text-emerald-600 text-[36px]">verified</span>
+                      </div>
+                      <span className="inline-block px-4 py-1 rounded-full bg-[#775a19]/10 text-[#775a19] text-[11px] font-semibold uppercase tracking-[0.1em] mb-2 border border-[#775a19]/20">
+                        ✦ Reservation Verified
+                      </span>
+                      <h3 className="font-['EB_Garamond'] text-[30px] font-medium text-[#1a1c1a]">
+                        Consultation Confirmed
+                      </h3>
+                      <p className="text-[14px] text-[#7c766d] max-w-[400px] mx-auto">
+                        Your private clinical consultation pass has been generated.
+                      </p>
                     </div>
-                    <h3 className="font-['EB_Garamond'] text-[28px] font-medium text-[#1a1c1a] mb-3">
-                      Booking Confirmed
-                    </h3>
-                    <p className="text-[15px] text-[#4b463e] leading-[24px] max-w-[420px] mx-auto mb-2">
-                      Thank you, <span className="font-semibold text-[#1a1c1a]">{formData.name}</span>. Your reservation is registered under reference <span className="font-mono text-[#775a19] font-semibold">#{bookingRef || 'SS360-1001'}</span>.
-                    </p>
-                    <p className="text-[13px] text-[#7c766d] max-w-[380px] mx-auto mb-2">
-                      Doctor Assigned: <span className="font-medium text-[#1a1c1a]">{formData.doctor}</span>
-                    </p>
-                    <p className="text-[13px] text-[#7c766d] max-w-[360px] mx-auto">
-                      A confirmation email was sent to <span className="italic">{formData.email}</span>. Our clinical coordinator will reach out to you within 2 hours.
-                    </p>
-                    <button
-                      onClick={() => {
-                        setIsSubmitted(false)
-                        setStep(1)
-                        setFormData({
-                          name: '',
-                          email: '',
-                          phone: '',
-                          doctor: 'Any Available Doctor',
-                          interest: 'Skin Resurfacing',
-                          date: '',
-                          slot: '',
-                        })
-                      }}
-                      className="mt-8 bg-[#665e4b] text-white font-['DM_Sans'] text-[13px] font-medium tracking-[0.08em] uppercase px-8 py-3 hover:bg-[#4d4634] transition-colors"
-                    >
-                      Book Another Consultation
-                    </button>
+
+                    {/* Verification Pass Voucher */}
+                    <div className="bg-[#faf9f6] border border-[#775a19]/30 rounded-2xl p-6 mb-6 shadow-sm relative overflow-hidden">
+                      <div className="flex justify-between items-center pb-4 border-b border-[#cdc6ba]/30 mb-4">
+                        <div>
+                          <p className="text-[11px] font-semibold text-[#7c766d] uppercase tracking-[0.08em]">PASS REFERENCE</p>
+                          <p className="font-mono text-[18px] font-bold text-[#775a19]">{bookingRef || 'SS360-1001'}</p>
+                        </div>
+                        <span className="px-3 py-1 bg-emerald-500/10 text-emerald-700 font-semibold text-[11px] uppercase tracking-[0.05em] rounded-full border border-emerald-500/20">
+                          CONFIRMED
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 text-[13px]">
+                        <div>
+                          <p className="text-[11px] text-[#7c766d] uppercase tracking-[0.05em]">Patient Name</p>
+                          <p className="font-semibold text-[#1a1c1a]">{formData.name}</p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] text-[#7c766d] uppercase tracking-[0.05em]">Specialist Assigned</p>
+                          <p className="font-semibold text-[#775a19]">{formData.doctor}</p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] text-[#7c766d] uppercase tracking-[0.05em]">Treatment Focus</p>
+                          <p className="font-medium text-[#1a1c1a]">{formData.interest}</p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] text-[#7c766d] uppercase tracking-[0.05em]">Date & Slot</p>
+                          <p className="font-semibold text-[#1a1c1a]">{formData.date} @ {formData.slot}</p>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 pt-3 border-t border-[#cdc6ba]/30 flex items-center gap-2 text-[12px] text-[#7c766d]">
+                        <span className="material-symbols-outlined text-[#775a19] text-[16px]">location_on</span>
+                        <span>Shivsai 360 Sanctuary, Tarabai Park, Kolhapur</span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                      <button
+                        onClick={() => window.print()}
+                        className="border border-[#775a19] text-[#775a19] font-['DM_Sans'] text-[12px] font-semibold tracking-[0.08em] uppercase px-6 py-3 rounded-full hover:bg-[#775a19]/10 transition-colors flex items-center justify-center gap-2"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">print</span>
+                        <span>Print / Save Pass</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsSubmitted(false)
+                          setStep(1)
+                          setFormData({
+                            name: '',
+                            email: '',
+                            phone: '',
+                            doctor: 'Any Available Doctor',
+                            interest: 'Skin Resurfacing',
+                            date: '',
+                            slot: '',
+                          })
+                        }}
+                        className="bg-gradient-to-r from-[#775a19] via-[#8c6b1f] to-[#5d4201] text-white font-['DM_Sans'] text-[12px] font-semibold tracking-[0.08em] uppercase px-6 py-3 rounded-full shadow-md hover:scale-105 transition-all"
+                      >
+                        Book Another Consultation
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   // Step Form

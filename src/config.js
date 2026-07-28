@@ -4,4 +4,4 @@ export const API_BASE_URL =
   import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:3001')
 
 export const ADMIN_URL =
-  import.meta.env.VITE_ADMIN_URL || 'https://clinicadmin.vercel.app'
+  import.meta.env.VITE_ADMIN_URL || 'https://shivsaiadmin.vercel.app'

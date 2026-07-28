@@ -5,9 +5,9 @@ export default function Footer() {
   return (
     <footer className="bg-white/40 backdrop-blur-2xl border-t border-white/60 shadow-lg">
       <div className="max-w-[1280px] mx-auto px-5 md:px-16 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-12">
           {/* Branding */}
-          <div className="lg:col-span-1">
+          <div className="col-span-1">
             <Link to="/" className="font-['EB_Garamond'] text-[24px] font-medium text-[#665e4b] italic">
               Shivsai 360
             </Link>

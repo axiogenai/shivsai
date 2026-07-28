@@ -1,13 +1,11 @@
 import express from 'express'
 import cors from 'cors'
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
-import { join, dirname } from 'path'
-import { fileURLToPath } from 'url'
+import { join } from 'path'
 import { v4 as uuidv4 } from 'uuid'
 import multer from 'multer'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
+const __dirname = join(process.cwd(), 'server')
 
 const app = express()
 const PORT = 3001

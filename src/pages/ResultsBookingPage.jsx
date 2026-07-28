@@ -279,7 +279,10 @@ export default function ResultsBookingPage() {
   }
 
   const handleConfirm = async (e) => {
-    e.preventDefault()
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
     if (validateStep(2)) {
       setSubmitting(true)
       try {
@@ -844,7 +847,8 @@ export default function ResultsBookingPage() {
                           </button>
                         ) : (
                           <button
-                            type="submit"
+                            type="button"
+                            onClick={(e) => handleConfirm(e)}
                             className="bg-gradient-to-r from-[#775a19] via-[#8c6b1f] to-[#5d4201] text-white font-['DM_Sans'] text-[13px] font-semibold tracking-[0.08em] uppercase px-8 py-2.5 rounded-full shadow-lg hover:scale-105 transition-all"
                           >
                             Confirm Appointment

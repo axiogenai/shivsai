@@ -1,5 +1,51 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+
+function CounterNumber({ target, suffix = '', duration = 1800 }) {
+  const [count, setCount] = useState(0)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    let animFrameId = null
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          let startTime = null
+          const step = (timestamp) => {
+            if (!startTime) startTime = timestamp
+            const progress = Math.min((timestamp - startTime) / duration, 1)
+            const easeProgress = 1 - Math.pow(1 - progress, 3)
+            setCount(Math.floor(easeProgress * target))
+
+            if (progress < 1) {
+              animFrameId = window.requestAnimationFrame(step)
+            } else {
+              setCount(target)
+            }
+          }
+          animFrameId = window.requestAnimationFrame(step)
+        } else {
+          if (animFrameId) window.cancelAnimationFrame(animFrameId)
+          setCount(0)
+        }
+      },
+      { threshold: 0.15 }
+    )
+
+    if (ref.current) observer.observe(ref.current)
+    return () => {
+      if (animFrameId) window.cancelAnimationFrame(animFrameId)
+      observer.disconnect()
+    }
+  }, [target, duration])
+
+  return (
+    <span ref={ref}>
+      {count.toLocaleString()}{suffix}
+    </span>
+  )
+}
 
 const FAQS = [
   {
@@ -74,19 +120,27 @@ export default function HomePage() {
         <div className="max-w-[1280px] mx-auto px-5 md:px-16 py-10">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
             <div>
-              <p className="font-['EB_Garamond'] text-[36px] md:text-[42px] font-medium text-[#775a19]">10,000+</p>
+              <p className="font-['EB_Garamond'] text-[36px] md:text-[42px] font-medium text-[#775a19]">
+                <CounterNumber target={10000} suffix="+" />
+              </p>
               <p className="font-['DM_Sans'] text-[13px] tracking-[0.08em] uppercase text-[#4b463e] mt-1">Trusted Patients</p>
             </div>
             <div className="md:border-x md:border-[#cdc6ba]/30">
-              <p className="font-['EB_Garamond'] text-[36px] md:text-[42px] font-medium text-[#775a19]">29</p>
+              <p className="font-['EB_Garamond'] text-[36px] md:text-[42px] font-medium text-[#775a19]">
+                <CounterNumber target={29} />
+              </p>
               <p className="font-['DM_Sans'] text-[13px] tracking-[0.08em] uppercase text-[#4b463e] mt-1">Clinical Protocols</p>
             </div>
             <div className="md:border-r md:border-[#cdc6ba]/30">
-              <p className="font-['EB_Garamond'] text-[36px] md:text-[42px] font-medium text-[#775a19]">15+</p>
+              <p className="font-['EB_Garamond'] text-[36px] md:text-[42px] font-medium text-[#775a19]">
+                <CounterNumber target={15} suffix="+" />
+              </p>
               <p className="font-['DM_Sans'] text-[13px] tracking-[0.08em] uppercase text-[#4b463e] mt-1">Years Excellence</p>
             </div>
             <div>
-              <p className="font-['EB_Garamond'] text-[36px] md:text-[42px] font-medium text-[#775a19]">✦</p>
+              <p className="font-['EB_Garamond'] text-[36px] md:text-[42px] font-medium text-[#775a19]">
+                <CounterNumber target={12} suffix="+" />
+              </p>
               <p className="font-['DM_Sans'] text-[13px] tracking-[0.08em] uppercase text-[#4b463e] mt-1">Certified Specialists</p>
             </div>
           </div>

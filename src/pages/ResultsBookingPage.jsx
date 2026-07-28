@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { API_BASE_URL } from '../config'
 
 // Case studies data for Before/After comparison
 const CASE_STUDIES = [
@@ -171,6 +172,9 @@ export default function ResultsBookingPage() {
   const location = useLocation()
   const [selectedCategory, setSelectedCategory] = useState('all')
 
+  const [doctorsList, setDoctorsList] = useState(DOCTORS)
+  const [caseStudiesList, setCaseStudiesList] = useState(CASE_STUDIES)
+
   // Form State
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
@@ -184,6 +188,21 @@ export default function ResultsBookingPage() {
   })
   const [errors, setErrors] = useState({})
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [bookingRef, setBookingRef] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+
+  // Fetch doctors and case studies from API
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/doctors`)
+      .then(res => res.json())
+      .then(data => { if (Array.isArray(data) && data.length > 0) setDoctorsList(data) })
+      .catch(err => console.log('Using default doctors fallback:', err))
+
+    fetch(`${API_BASE_URL}/api/case-studies`)
+      .then(res => res.json())
+      .then(data => { if (Array.isArray(data) && data.length > 0) setCaseStudiesList(data) })
+      .catch(err => console.log('Using default case studies fallback:', err))
+  }, [])
 
   // Pre-fill form from URL query string & scroll to hashes
   useEffect(() => {
@@ -198,7 +217,8 @@ export default function ResultsBookingPage() {
       setTimeout(() => {
         const el = document.getElementById(hash)
         if (el) {
-          el.scrollIntoView({ behavior: 'smooth' })
+          const y = el.getBoundingClientRect().top + window.scrollY - 70
+          window.scrollTo({ top: y, behavior: 'smooth' })
         }
       }, 250)
     } else {
@@ -246,10 +266,25 @@ export default function ResultsBookingPage() {
     setStep((prev) => prev - 1)
   }
 
-  const handleConfirm = (e) => {
+  const handleConfirm = async (e) => {
     e.preventDefault()
     if (validateStep(2)) {
-      setIsSubmitted(true)
+      setSubmitting(true)
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/bookings`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        })
+        const data = await res.json()
+        setBookingRef(data.refId || `SS360-${Math.floor(1000 + Math.random() * 9000)}`)
+      } catch (err) {
+        console.error('Booking submission error:', err)
+        setBookingRef(`SS360-${Math.floor(1000 + Math.random() * 9000)}`)
+      } finally {
+        setSubmitting(false)
+        setIsSubmitted(true)
+      }
     }
   }
 
@@ -260,8 +295,8 @@ export default function ResultsBookingPage() {
   }
 
   const filteredCaseStudies = selectedCategory === 'all'
-    ? CASE_STUDIES
-    : CASE_STUDIES.filter(c => c.category === selectedCategory)
+    ? caseStudiesList
+    : caseStudiesList.filter(c => c.category === selectedCategory)
 
   const slots = [
     { time: '09:00 AM', disabled: true },
@@ -277,7 +312,7 @@ export default function ResultsBookingPage() {
       <section className="relative h-[55vh] flex items-center justify-start overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXu0anOSUjdtvwV-HG-8CmrBA8DVOe3Smx0x757rszmR4EM7TZtRvDvYQJ7QtbSLVZ_lBORpyn6_jxli3lDoqbH6bNWaNR3AK-Kl2KIzsrqJW_UtExWXi1c3Edf_W3SB9ldwg7vgue4xHtMP-auM8rWw2Esq4doiD_BbDKU97WidiY0VzGxkgE3KYXdBgTFN7uo0o8fp6PyZCtTQIkPCB08sE3cP-3SH4W088qba51Z5m7axbzldznhL3k9D2hofN8wr7JYPahuRuSY"
+            src="/images/doctor_consultation_hero_1785201942839.jpg"
             alt="Dermatologist consultation"
             className="w-full h-full object-cover saturate-[0.85]"
           />
@@ -353,25 +388,25 @@ export default function ResultsBookingPage() {
       </section>
 
       {/* Expert Doctors Section */}
-      <section className="bg-white border-y border-[#cdc6ba]/30 py-20">
-        <div className="max-w-[1280px] mx-auto px-5 md:px-16">
-          <div className="text-center mb-16">
-            <p className="font-['DM_Sans'] text-[14px] font-medium tracking-[0.15em] uppercase text-[#775a19] mb-3">
+      <section className="max-w-[1280px] mx-auto px-5 md:px-16 py-8">
+        <div>
+          <div className="text-center mb-6">
+            <p className="font-['DM_Sans'] text-[13px] font-bold tracking-[0.15em] uppercase text-[#775a19] mb-2">
               Medical Leadership
             </p>
-            <h2 className="font-['EB_Garamond'] text-[36px] md:text-[48px] font-medium text-[#1a1c1a]">
+            <h2 className="font-['EB_Garamond'] text-[32px] md:text-[44px] font-medium text-[#1a1c1a]">
               Meet Our Clinical Specialists
             </h2>
-            <p className="text-[15px] text-[#4b463e] mt-3 max-w-[560px] mx-auto">
+            <p className="text-[14px] text-[#4b463e] mt-2 max-w-[560px] mx-auto">
               Board-certified practitioners combining international clinical protocols with artistic accuracy.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {DOCTORS.map((doc) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {doctorsList.map((doc) => (
               <div
                 key={doc.name}
-                className="bg-[#faf9f6] border border-[#cdc6ba]/30 overflow-hidden bento-card flex flex-col justify-between"
+                className="bg-white/70 backdrop-blur-md border border-white/80 rounded-3xl overflow-hidden shadow-lg shadow-black/5 bento-card flex flex-col justify-between"
               >
                 <div>
                   <div className="h-[280px] overflow-hidden relative">
@@ -390,10 +425,10 @@ export default function ResultsBookingPage() {
                     <p className="text-[12px] text-[#7c766d] mb-4 leading-[18px]">{doc.degree}</p>
 
                     <div className="space-y-1">
-                      {doc.specialties.map((s, i) => (
-                        <div key={i} className="text-[12px] text-[#4b463e] flex items-center gap-1.5">
-                          <span className="material-symbols-outlined text-[14px] text-[#775a19]">check_circle</span>
-                          {s}
+                      {doc.specialties?.map((spec, i) => (
+                        <div key={i} className="flex items-center gap-1.5 text-[12px] text-[#4b463e]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#775a19]" />
+                          {spec}
                         </div>
                       ))}
                     </div>
@@ -403,9 +438,9 @@ export default function ResultsBookingPage() {
                 <div className="p-6 pt-0">
                   <button
                     onClick={() => selectDoctorAndBook(doc.name)}
-                    className="w-full bg-[#665e4b] text-white font-['DM_Sans'] text-[12px] font-medium tracking-[0.05em] uppercase py-3 hover:bg-[#4d4634] transition-colors"
+                    className="w-full bg-gradient-to-r from-[#775a19] via-[#8c6b1f] to-[#5d4201] text-white font-['DM_Sans'] text-[12px] font-semibold tracking-[0.05em] uppercase py-2.5 rounded-full shadow-md hover:scale-105 transition-all"
                   >
-                    Book with {doc.name.split(' ')[1]}
+                    Book with {doc.name.split(' ')[1] || doc.name}
                   </button>
                 </div>
               </div>
@@ -415,8 +450,7 @@ export default function ResultsBookingPage() {
       </section>
 
       {/* Multi-step Booking Form Section */}
-      <section id="booking" className="bg-[#f4f3f1] border-b border-[#cdc6ba]/30">
-        <div className="max-w-[1280px] mx-auto px-5 md:px-16 py-20 md:py-28">
+      <section id="booking" className="max-w-[1280px] mx-auto px-5 md:px-16 py-8 md:py-10 scroll-mt-24">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             
             {/* Left Column: Info & Steps */}
@@ -479,7 +513,7 @@ export default function ResultsBookingPage() {
 
             {/* Right Column: Form Box */}
             <div className="lg:col-span-7">
-              <div className="bg-white border border-[#cdc6ba]/30 p-6 md:p-10 custom-shadow min-h-[460px] flex flex-col justify-between">
+              <div className="bg-white/75 backdrop-blur-xl border border-white/80 rounded-3xl p-6 md:p-10 shadow-xl shadow-black/5 min-h-[460px] flex flex-col justify-between">
                 
                 {isSubmitted ? (
                   // Success State
@@ -491,7 +525,7 @@ export default function ResultsBookingPage() {
                       Booking Confirmed
                     </h3>
                     <p className="text-[15px] text-[#4b463e] leading-[24px] max-w-[420px] mx-auto mb-2">
-                      Thank you, <span className="font-semibold text-[#1a1c1a]">{formData.name}</span>. Your reservation is registered under reference <span className="font-mono text-[#775a19] font-semibold">#SS360-{Math.floor(1000 + Math.random() * 9000)}</span>.
+                      Thank you, <span className="font-semibold text-[#1a1c1a]">{formData.name}</span>. Your reservation is registered under reference <span className="font-mono text-[#775a19] font-semibold">#{bookingRef || 'SS360-1001'}</span>.
                     </p>
                     <p className="text-[13px] text-[#7c766d] max-w-[380px] mx-auto mb-2">
                       Doctor Assigned: <span className="font-medium text-[#1a1c1a]">{formData.doctor}</span>
@@ -745,14 +779,14 @@ export default function ResultsBookingPage() {
                           <button
                             type="button"
                             onClick={handleNext}
-                            className="bg-[#665e4b] text-white font-['DM_Sans'] text-[13px] font-medium tracking-[0.08em] uppercase px-8 py-3 hover:bg-[#4d4634] transition-colors"
+                            className="bg-gradient-to-r from-[#775a19] via-[#8c6b1f] to-[#5d4201] text-white font-['DM_Sans'] text-[13px] font-semibold tracking-[0.08em] uppercase px-8 py-2.5 rounded-full shadow-md hover:scale-105 transition-all"
                           >
                             Continue
                           </button>
                         ) : (
                           <button
                             type="submit"
-                            className="bg-[#775a19] text-white font-['DM_Sans'] text-[13px] font-medium tracking-[0.08em] uppercase px-8 py-3 hover:bg-[#5d4201] transition-colors"
+                            className="bg-gradient-to-r from-[#775a19] via-[#8c6b1f] to-[#5d4201] text-white font-['DM_Sans'] text-[13px] font-semibold tracking-[0.08em] uppercase px-8 py-2.5 rounded-full shadow-lg hover:scale-105 transition-all"
                           >
                             Confirm Appointment
                           </button>
@@ -764,16 +798,15 @@ export default function ResultsBookingPage() {
               </div>
             </div>
           </div>
-        </div>
       </section>
 
       {/* Testimonials Section */}
-      <section id="reviews" className="max-w-[1280px] mx-auto px-5 md:px-16 py-20">
-        <div className="text-center mb-16">
-          <p className="font-['DM_Sans'] text-[14px] font-medium tracking-[0.15em] uppercase text-[#775a19] mb-3">
+      <section id="reviews" className="max-w-[1280px] mx-auto px-5 md:px-16 py-8">
+        <div className="text-center mb-6">
+          <p className="font-['DM_Sans'] text-[13px] font-bold tracking-[0.15em] uppercase text-[#775a19] mb-2">
             Patient Stories
           </p>
-          <h2 className="font-['EB_Garamond'] text-[36px] md:text-[48px] font-medium text-[#1a1c1a]">
+          <h2 className="font-['EB_Garamond'] text-[32px] md:text-[44px] font-medium text-[#1a1c1a]">
             Verified Testimonials
           </h2>
         </div>

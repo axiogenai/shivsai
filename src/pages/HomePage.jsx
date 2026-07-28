@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { API_BASE_URL } from '../config'
 
 function CounterNumber({ target, suffix = '', duration = 1800 }) {
   const [count, setCount] = useState(0)
@@ -58,17 +59,30 @@ const FAQS = [
   },
   {
     q: "How many sessions of Laser Hair Removal or Acne Resurfacing will I need?",
-    a: "Most patients experience noticeable skin improvement in 1 to 2 sessions. Full clinical results typically require 4 to 6 sessions depending on skin type and protocol."
+    a: "Protocol duration depends on baseline medical diagnostics. Typically, hair reduction requires 6–8 sessions, while scar revision requires 3–5 sessions scheduled 4 weeks apart."
   },
   {
-    q: "Is there any downtime after medical-grade facials or laser peels?",
-    a: "Treatments like Hydrafacial and Glow Facials have zero downtime. Advanced laser peels or microneedling may produce mild pinkness for 24 to 48 hours."
+    q: "What safety protocols are in place at the clinic?",
+    a: "We adhere strictly to US FDA-cleared laser technology, hospital-grade sterilization protocols, disposable micro-needles, and single-patient dermal ampoules."
   }
 ]
 
 export default function HomePage() {
   const navigate = useNavigate()
-  const [openFaq, setOpenFaq] = useState(0)
+  const [openFaq, setOpenFaq] = useState(null)
+  const [protocolCount, setProtocolCount] = useState(29)
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/treatments`)
+      .then(res => res.json())
+      .then(data => {
+        if (data) {
+          const total = (data.skin?.length || 0) + (data.hair?.length || 0) + (data.makeup?.length || 0)
+          if (total > 0) setProtocolCount(total)
+        }
+      })
+      .catch(err => console.log('HomePage protocols count fallback:', err))
+  }, [])
 
   return (
     <div>
@@ -83,28 +97,33 @@ export default function HomePage() {
           <div className="hero-gradient absolute inset-0" />
         </div>
 
-        <div className="relative z-10 text-center px-5 max-w-[840px] mx-auto">
-          <p className="font-['DM_Sans'] text-[14px] font-medium tracking-[0.15em] uppercase text-[#775a19] mb-4">
-            Medical Aesthetics Sanctuary
-          </p>
-          <h1 className="font-['EB_Garamond'] text-[48px] md:text-[76px] font-medium leading-[1.08] text-[#1a1c1a] mb-6">
+        <div className="relative z-10 text-center px-5 max-w-[900px] mx-auto">
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/70 backdrop-blur-md border border-white/90 shadow-sm mb-6">
+            <span className="text-[12px] text-[#775a19]">✦</span>
+            <span className="font-['DM_Sans'] text-[13px] md:text-[14px] font-bold tracking-[0.18em] uppercase text-[#5d4201]">
+              Medical Aesthetics Sanctuary
+            </span>
+          </div>
+          <h1 className="font-['EB_Garamond'] text-[56px] md:text-[92px] font-semibold leading-[1.04] text-[#111111] drop-shadow-sm mb-6">
             Restore. Renew.<br />Radiate.
           </h1>
-          <p className="text-[16px] md:text-[18px] text-[#4b463e] leading-[28px] max-w-[620px] mx-auto mb-10">
+          <p className="text-[18px] md:text-[22px] font-medium text-[#222222] leading-[32px] max-w-[720px] mx-auto mb-10">
             Kolhapur's Premier Medical Aesthetic Clinic. 29 science-backed skin, hair, and cosmetic protocols for lasting elegance.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/services"
-              className="bg-[#665e4b] text-white font-['DM_Sans'] text-[14px] font-medium tracking-[0.08em] uppercase px-10 py-4 hover:bg-[#4d4634] transition-colors duration-300 shadow-md"
+              className="bg-gradient-to-r from-[#775a19] via-[#8c6b1f] to-[#5d4201] text-white font-['DM_Sans'] text-[14px] font-semibold tracking-[0.1em] uppercase px-10 py-4 rounded-full shadow-[0_10px_25px_-5px_rgba(119,90,25,0.4)] border border-[#ffdea5]/30 hover:scale-105 hover:shadow-[0_15px_35px_-5px_rgba(119,90,25,0.5)] transition-all duration-300 flex items-center justify-center gap-2 group"
             >
-              Explore 29 Treatments
+              <span>Explore {protocolCount} Treatments</span>
+              <span className="text-[16px] group-hover:translate-x-1 transition-transform">→</span>
             </Link>
             <button
               onClick={() => navigate('/results#booking')}
-              className="border border-[#665e4b] bg-white/40 text-[#665e4b] font-['DM_Sans'] text-[14px] font-medium tracking-[0.08em] uppercase px-10 py-4 hover:bg-[#665e4b] hover:text-white transition-colors duration-300"
+              className="bg-white/60 backdrop-blur-md text-[#1a1c1a] border border-white/90 font-['DM_Sans'] text-[14px] font-semibold tracking-[0.1em] uppercase px-10 py-4 rounded-full shadow-md hover:bg-white/90 hover:border-[#775a19]/50 hover:text-[#775a19] hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
             >
-              Meet Our Doctors
+              <span>Meet Our Doctors</span>
+              <span className="material-symbols-outlined text-[18px]">stethoscope</span>
             </button>
           </div>
         </div>
@@ -116,9 +135,9 @@ export default function HomePage() {
       </section>
 
       {/* Stats Bar */}
-      <section className="bg-[#f4f3f1] border-y border-[#cdc6ba]/30">
-        <div className="max-w-[1280px] mx-auto px-5 md:px-16 py-10">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+      <section className="max-w-[1280px] mx-auto px-5 md:px-16 py-4 my-4">
+        <div className="bg-white/60 backdrop-blur-xl border border-white/80 shadow-lg shadow-black/5 rounded-3xl p-6 md:p-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
             <div>
               <p className="font-['EB_Garamond'] text-[36px] md:text-[42px] font-medium text-[#775a19]">
                 <CounterNumber target={10000} suffix="+" />
@@ -127,7 +146,7 @@ export default function HomePage() {
             </div>
             <div className="md:border-x md:border-[#cdc6ba]/30">
               <p className="font-['EB_Garamond'] text-[36px] md:text-[42px] font-medium text-[#775a19]">
-                <CounterNumber target={29} />
+                <CounterNumber target={protocolCount} />
               </p>
               <p className="font-['DM_Sans'] text-[13px] tracking-[0.08em] uppercase text-[#4b463e] mt-1">Clinical Protocols</p>
             </div>
@@ -148,8 +167,8 @@ export default function HomePage() {
       </section>
 
       {/* Curated Specialties */}
-      <section className="max-w-[1280px] mx-auto px-5 md:px-16 py-20 md:py-28">
-        <div className="text-center mb-16">
+      <section className="max-w-[1280px] mx-auto px-5 md:px-16 py-10 md:py-14">
+        <div className="text-center mb-8">
           <p className="font-['DM_Sans'] text-[14px] font-medium tracking-[0.15em] uppercase text-[#775a19] mb-3">
             Our Specialties
           </p>
@@ -181,11 +200,11 @@ export default function HomePage() {
           ].map((item) => (
             <div
               key={item.num}
-              className="bento-card bg-white border border-[#cdc6ba]/30 p-8 md:p-10 group cursor-pointer flex flex-col justify-between"
+              className="bento-card bg-white/70 backdrop-blur-md border border-white/80 shadow-lg shadow-black/5 p-8 md:p-10 rounded-3xl group cursor-pointer flex flex-col justify-between"
             >
               <div>
                 <div className="flex justify-between items-start mb-8">
-                  <div className="w-12 h-12 rounded-full bg-[#ffdea5]/40 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-[#775a19]/10 flex items-center justify-center">
                     <span className="material-symbols-outlined text-[#775a19] text-[24px]">{item.icon}</span>
                   </div>
                   <span className="font-['EB_Garamond'] text-[48px] font-medium text-[#cdc6ba]/50 leading-none">
@@ -211,40 +230,44 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* AI Analyzer CTA */}
-      <section className="bg-[#665e4b] relative overflow-hidden text-white">
-        <div className="max-w-[1280px] mx-auto px-5 md:px-16 py-20 md:py-28">
+      {/* AI Analyzer CTA Banner */}
+      <section className="max-w-[1280px] mx-auto px-5 md:px-16 py-12">
+        <div className="glass-panel bg-white/40 backdrop-blur-2xl border border-white/80 shadow-2xl rounded-3xl overflow-hidden p-8 md:p-16 relative">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <p className="font-['DM_Sans'] text-[14px] font-medium tracking-[0.15em] uppercase text-[#e9c176] mb-4">
+              <p className="font-['DM_Sans'] text-[14px] font-medium tracking-[0.15em] uppercase text-[#775a19] mb-4">
                 AI Clinical Engine
               </p>
-              <h2 className="font-['EB_Garamond'] text-[36px] md:text-[48px] font-medium leading-[1.1] mb-6">
+              <h2 className="font-['EB_Garamond'] text-[36px] md:text-[48px] font-medium text-[#1a1c1a] leading-[1.1] mb-6">
                 Precision Skin Analysis<br />by AI
               </h2>
-              <p className="text-[16px] text-[#d1c5ae] leading-[26px] mb-8 max-w-[480px]">
+              <p className="text-[16px] text-[#4b463e] leading-[26px] mb-8 max-w-[480px]">
                 Upload your facial photo to analyze hydration, UV exposure, elasticity, and pore health in under 60 seconds. Receive an instant doctor-matched treatment roadmap.
               </p>
               <button
                 onClick={() => {
-                  navigate('/services')
+                  navigate('/services#ai-analyzer')
                   setTimeout(() => {
                     const el = document.getElementById('ai-analyzer')
-                    if (el) el.scrollIntoView({ behavior: 'smooth' })
-                  }, 100)
+                    if (el) {
+                      const y = el.getBoundingClientRect().top + window.scrollY - 70
+                      window.scrollTo({ top: y, behavior: 'smooth' })
+                    }
+                  }, 120)
                 }}
-                className="bg-[#775a19] text-white font-['DM_Sans'] text-[14px] font-medium tracking-[0.08em] uppercase px-10 py-4 hover:bg-[#5d4201] transition-colors duration-300"
+                className="bg-gradient-to-r from-[#775a19] via-[#8c6b1f] to-[#5d4201] text-white font-['DM_Sans'] text-[14px] font-semibold tracking-[0.08em] uppercase px-10 py-4 rounded-full shadow-lg hover:scale-105 transition-all duration-300 inline-flex items-center gap-2"
               >
-                Try AI Skin Diagnostics
+                <span>Try AI Skin Diagnostics</span>
+                <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
               </button>
             </div>
 
             <div className="relative flex items-center justify-center">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/80">
                 <img
                   src="/images/ai_facial_tech_1784892457264.jpg"
                   alt="AI skin analysis scanner"
-                  className="w-full max-w-[500px] rounded-2xl"
+                  className="w-full max-w-[500px] rounded-3xl object-cover"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="relative">
@@ -261,8 +284,8 @@ export default function HomePage() {
       </section>
 
       {/* Clinical FAQ Accordion Section */}
-      <section className="max-w-[1280px] mx-auto px-5 md:px-16 py-20 md:py-28">
-        <div className="text-center mb-16">
+      <section className="max-w-[1280px] mx-auto px-5 md:px-16 py-6 md:py-8">
+        <div className="text-center mb-4">
           <p className="font-['DM_Sans'] text-[14px] font-medium tracking-[0.15em] uppercase text-[#775a19] mb-3">
             Patient Enquiries
           </p>
@@ -277,7 +300,7 @@ export default function HomePage() {
             return (
               <div
                 key={idx}
-                className="border border-[#cdc6ba]/30 bg-white transition-all duration-300"
+                className="glass-card rounded-2xl border border-white/80 shadow-md shadow-black/5 overflow-hidden transition-all duration-300"
               >
                 <button
                   onClick={() => setOpenFaq(isOpen ? null : idx)}

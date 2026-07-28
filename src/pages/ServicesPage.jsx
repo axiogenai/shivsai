@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { API_BASE_URL } from '../config'
 
 const services = {
   skin: [
@@ -67,10 +68,28 @@ const SAMPLE_PHOTOS = [
   }
 ]
 
+const DEFAULT_SERVICES = services
+
 export default function ServicesPage() {
+  const [servicesData, setServicesData] = useState(DEFAULT_SERVICES)
   const [activeTab, setActiveTab] = useState('skin')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedPackage, setSelectedPackage] = useState([])
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/treatments`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && (data.skin || data.hair || data.makeup)) {
+          setServicesData({
+            skin: data.skin || [],
+            hair: data.hair || [],
+            makeup: data.makeup || []
+          })
+        }
+      })
+      .catch((err) => console.log('Using default treatments fallback:', err))
+  }, [])
   
   // AI Diagnostics State
   const [uploadedImage, setUploadedImage] = useState(SAMPLE_PHOTOS[0].img)
@@ -162,56 +181,57 @@ export default function ServicesPage() {
     navigate(`/results#booking?treatment=${encodeURIComponent(packageSummary || 'Custom Package')}`)
   }
 
-  const filteredServices = services[activeTab].filter(
+  const currentCategoryList = servicesData[activeTab] || []
+  const filteredServices = currentCategoryList.filter(
     (s) =>
       s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       s.desc.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   const tabs = [
-    { key: 'skin', label: 'Skin Protocols', icon: 'dermatology', count: services.skin.length },
-    { key: 'hair', label: 'Hair Treatments', icon: 'spa', count: services.hair.length },
-    { key: 'makeup', label: 'Aesthetic Makeup', icon: 'brush', count: services.makeup.length },
+    { key: 'skin', label: 'Skin Protocols', icon: 'dermatology', count: (servicesData.skin || []).length },
+    { key: 'hair', label: 'Hair Treatments', icon: 'spa', count: (servicesData.hair || []).length },
+    { key: 'makeup', label: 'Aesthetic Makeup', icon: 'brush', count: (servicesData.makeup || []).length },
   ]
 
   return (
     <div>
       {/* Hero Header */}
-      <section className="max-w-[1280px] mx-auto px-5 md:px-16 py-16 md:py-20 text-center">
-        <p className="font-['DM_Sans'] text-[14px] font-medium tracking-[0.15em] uppercase text-[#775a19] mb-4">
+      <section className="max-w-[1280px] mx-auto px-5 md:px-16 py-6 md:py-8 text-center">
+        <p className="font-['DM_Sans'] text-[13px] font-bold tracking-[0.18em] uppercase text-[#775a19] mb-2">
           Medical Aesthetic Portfolio
         </p>
-        <h1 className="font-['EB_Garamond'] text-[40px] md:text-[64px] font-medium text-[#1a1c1a] leading-[1.1] mb-6">
+        <h1 className="font-['EB_Garamond'] text-[38px] md:text-[56px] font-medium text-[#1a1c1a] leading-[1.08] mb-3">
           Aesthetics Elevated.<br />Science Perfected.
         </h1>
-        <p className="text-[16px] md:text-[18px] text-[#4b463e] leading-[28px] max-w-[640px] mx-auto mb-10">
+        <p className="text-[15px] md:text-[17px] text-[#4b463e] leading-[24px] max-w-[640px] mx-auto mb-4">
           Discover 29 clinical-grade skin, hair, and cosmetic procedures designed by board-certified dermatologists.
         </p>
 
         {/* Search Input */}
         <div className="max-w-[560px] mx-auto relative flex items-center">
-          <span className="material-symbols-outlined absolute left-4 text-[#7c766d] text-[22px]">search</span>
+          <span className="material-symbols-outlined absolute left-4 text-[#7c766d] text-[20px]">search</span>
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search treatments (e.g., Hydrafacial, PRP, Botox)..."
-            className="w-full pl-12 pr-10 py-3.5 bg-white border border-[#cdc6ba] font-['DM_Sans'] text-[14px] text-[#1a1c1a] focus:outline-none focus:border-[#775a19] transition-colors shadow-sm"
+            className="w-full pl-11 pr-10 py-2.5 rounded-full bg-white/70 backdrop-blur-md border border-white/90 font-['DM_Sans'] text-[14px] text-[#1a1c1a] focus:outline-none focus:border-[#775a19] transition-all shadow-sm"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
               className="absolute right-3 text-[#7c766d] hover:text-[#1a1c1a]"
             >
-              <span className="material-symbols-outlined text-[20px]">close</span>
+              <span className="material-symbols-outlined text-[18px]">close</span>
             </button>
           )}
         </div>
       </section>
 
       {/* Tabs */}
-      <section className="max-w-[1280px] mx-auto px-5 md:px-16 pb-20">
-        <div className="flex flex-wrap justify-center gap-3 mb-12">
+      <section className="max-w-[1280px] mx-auto px-5 md:px-16 pb-8">
+        <div className="flex flex-wrap justify-center gap-3 mb-6">
           {tabs.map((tab) => (
             <button
               key={tab.key}
@@ -219,10 +239,10 @@ export default function ServicesPage() {
                 setActiveTab(tab.key)
                 setSearchQuery('')
               }}
-              className={`flex items-center gap-2.5 px-6 py-3 font-['DM_Sans'] text-[14px] font-medium tracking-[0.05em] uppercase transition-all duration-300 border ${
+              className={`flex items-center gap-2.5 px-6 py-2.5 rounded-full font-['DM_Sans'] text-[13px] font-semibold tracking-[0.05em] uppercase transition-all duration-300 ${
                 activeTab === tab.key
-                  ? 'bg-[#665e4b] text-white border-[#665e4b] shadow-sm'
-                  : 'bg-white text-[#4b463e] border-[#cdc6ba]/50 hover:border-[#665e4b]'
+                  ? 'bg-gradient-to-r from-[#775a19] via-[#8c6b1f] to-[#5d4201] text-white shadow-md border border-[#ffdea5]/30'
+                  : 'bg-white/60 backdrop-blur-md text-[#4b463e] border border-white/80 hover:bg-white/85 hover:text-[#1a1c1a]'
               }`}
             >
               <span className="material-symbols-outlined text-[20px]">{tab.icon}</span>
@@ -255,8 +275,8 @@ export default function ServicesPage() {
               return (
                 <div
                   key={service.name}
-                  className={`bento-card bg-white border overflow-hidden group transition-all duration-300 flex flex-col justify-between ${
-                    isSelected ? 'border-[#775a19] ring-2 ring-[#775a19]/20' : 'border-[#cdc6ba]/30'
+                  className={`bento-card bg-white/70 backdrop-blur-md border overflow-hidden rounded-3xl shadow-lg shadow-black/5 group transition-all duration-300 flex flex-col justify-between ${
+                    isSelected ? 'border-[#775a19] ring-2 ring-[#775a19]/20' : 'border-white/80'
                   }`}
                 >
                   <div>
@@ -295,10 +315,10 @@ export default function ServicesPage() {
 
                     <button
                       onClick={() => togglePackageItem(service)}
-                      className={`text-[12px] font-['DM_Sans'] font-medium uppercase tracking-[0.05em] px-4 py-2 transition-all ${
+                      className={`text-[12px] font-['DM_Sans'] font-medium uppercase tracking-[0.05em] px-4 py-1.5 rounded-full transition-all ${
                         isSelected
-                          ? 'bg-[#775a19] text-white'
-                          : 'bg-[#f4f3f1] text-[#665e4b] hover:bg-[#665e4b] hover:text-white'
+                          ? 'bg-red-500/80 text-white shadow-sm'
+                          : 'bg-[#775a19]/10 text-[#775a19] hover:bg-[#775a19] hover:text-white font-semibold shadow-sm'
                       }`}
                     >
                       {isSelected ? 'Remove' : '+ Add to Package'}
@@ -312,26 +332,26 @@ export default function ServicesPage() {
       </section>
 
       {/* Treatment Package Estimator Section */}
-      <section id="estimator" className="bg-[#665e4b] text-white py-16 md:py-20 relative">
-        <div className="max-w-[1280px] mx-auto px-5 md:px-16">
+      <section id="estimator" className="max-w-[1280px] mx-auto px-5 md:px-16 py-10 md:py-12">
+        <div className="glass-panel bg-white/40 backdrop-blur-2xl border border-white/80 rounded-3xl p-8 md:p-12 shadow-2xl">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             <div className="lg:col-span-6">
-              <p className="font-['DM_Sans'] text-[14px] font-medium tracking-[0.15em] uppercase text-[#e9c176] mb-3">
+              <p className="font-['DM_Sans'] text-[13px] font-bold tracking-[0.15em] uppercase text-[#775a19] mb-3">
                 Bespoke Planning Tool
               </p>
-              <h2 className="font-['EB_Garamond'] text-[36px] md:text-[48px] font-medium leading-[1.1] mb-4">
+              <h2 className="font-['EB_Garamond'] text-[36px] md:text-[48px] font-medium text-[#1a1c1a] leading-[1.1] mb-4">
                 Treatment Package Estimator
               </h2>
-              <p className="text-[15px] text-[#d1c5ae] leading-[24px] mb-6">
+              <p className="text-[15px] text-[#4b463e] leading-[24px] mb-6">
                 Select your preferred procedures from our list above to customize a combined treatment roadmap. Bundle 2+ procedures for multi-treatment savings!
               </p>
-              <div className="flex flex-wrap gap-4 text-[13px] text-[#e8dcc4]">
-                <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
-                  <span className="material-symbols-outlined text-[16px] text-[#e9c176]">percent</span>
+              <div className="flex flex-wrap gap-4 text-[13px] text-[#775a19] font-semibold">
+                <div className="flex items-center gap-2 bg-[#775a19]/10 border border-[#775a19]/20 px-4 py-2 rounded-full">
+                  <span className="material-symbols-outlined text-[16px] text-[#775a19]">percent</span>
                   10% off for 2 procedures
                 </div>
-                <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
-                  <span className="material-symbols-outlined text-[16px] text-[#e9c176]">workspace_premium</span>
+                <div className="flex items-center gap-2 bg-[#775a19]/10 border border-[#775a19]/20 px-4 py-2 rounded-full">
+                  <span className="material-symbols-outlined text-[16px] text-[#775a19]">workspace_premium</span>
                   15% off for 3+ procedures
                 </div>
               </div>
@@ -339,7 +359,7 @@ export default function ServicesPage() {
 
             {/* Estimator Calculator Card */}
             <div className="lg:col-span-6">
-              <div className="bg-[#faf9f6] text-[#1a1c1a] border border-[#cdc6ba]/30 p-6 md:p-8 custom-shadow">
+              <div className="bg-white/80 backdrop-blur-md text-[#1a1c1a] border border-white/90 rounded-3xl p-6 md:p-8 shadow-lg">
                 <div className="flex justify-between items-center pb-4 border-b border-[#cdc6ba]/30 mb-4">
                   <h3 className="font-['EB_Garamond'] text-[22px] font-medium">Your Custom Package</h3>
                   <span className="font-['DM_Sans'] text-[13px] text-[#775a19] font-medium">
@@ -393,7 +413,7 @@ export default function ServicesPage() {
 
                     <button
                       onClick={bookCustomPackage}
-                      className="mt-6 w-full bg-[#775a19] text-white font-['DM_Sans'] text-[14px] font-medium tracking-[0.08em] uppercase py-3.5 hover:bg-[#5d4201] transition-colors"
+                      className="mt-6 w-full bg-gradient-to-r from-[#775a19] via-[#8c6b1f] to-[#5d4201] text-white font-['DM_Sans'] text-[14px] font-semibold tracking-[0.08em] uppercase py-3.5 rounded-full shadow-lg hover:scale-105 transition-all"
                     >
                       Book Custom Package Now
                     </button>
@@ -406,16 +426,16 @@ export default function ServicesPage() {
       </section>
 
       {/* AI Skin Analyzer Section */}
-      <section id="ai-analyzer" className="bg-[#f4f3f1] border-y border-[#cdc6ba]/30">
-        <div className="max-w-[1280px] mx-auto px-5 md:px-16 py-20 md:py-28">
-          <div className="text-center mb-16">
-            <p className="font-['DM_Sans'] text-[14px] font-medium tracking-[0.15em] uppercase text-[#775a19] mb-3">
+      <section id="ai-analyzer" className="max-w-[1280px] mx-auto px-5 md:px-16 py-10 md:py-12">
+        <div className="glass-panel bg-white/40 backdrop-blur-2xl border border-white/80 rounded-3xl p-8 md:p-12 shadow-2xl">
+          <div className="text-center mb-6">
+            <p className="font-['DM_Sans'] text-[13px] font-bold tracking-[0.15em] uppercase text-[#775a19] mb-2">
               AI Clinical Diagnostics
             </p>
-            <h2 className="font-['EB_Garamond'] text-[36px] md:text-[48px] font-medium text-[#1a1c1a]">
+            <h2 className="font-['EB_Garamond'] text-[32px] md:text-[44px] font-medium text-[#1a1c1a]">
               Skin Analysis Engine
             </h2>
-            <p className="text-[15px] text-[#4b463e] mt-3 max-w-[540px] mx-auto">
+            <p className="text-[14px] text-[#4b463e] mt-2 max-w-[540px] mx-auto">
               Upload your own facial photo or choose a preset clinical scan to evaluate 5 diagnostic parameters.
             </p>
           </div>
@@ -603,7 +623,7 @@ export default function ServicesPage() {
                   </div>
                   <button
                     onClick={() => navigate(`/results#booking?treatment=${encodeURIComponent(activeRecommendation)}`)}
-                    className="bg-[#665e4b] text-white text-[12px] font-medium tracking-[0.05em] uppercase px-4 py-2.5 hover:bg-[#4d4634] transition-colors flex-shrink-0"
+                    className="bg-gradient-to-r from-[#775a19] via-[#8c6b1f] to-[#5d4201] text-white text-[12px] font-semibold tracking-[0.05em] uppercase px-5 py-2.5 rounded-full shadow-md hover:scale-105 transition-all flex-shrink-0"
                   >
                     Book Protocol
                   </button>

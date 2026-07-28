@@ -18,7 +18,10 @@ dist-ssr
 .idea
 .DS_Store
 *.suo
-*.ntvs*
+*.ntvsload
 *.njsproj
 *.sln
 *.sw?
+
+scratch_*.js
+scratch_*.cjs

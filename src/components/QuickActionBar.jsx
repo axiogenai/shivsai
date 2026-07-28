@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { API_BASE_URL } from '../config'
 
 export default function QuickActionBar() {
   const [quickBookOpen, setQuickBookOpen] = useState(false)
@@ -7,9 +8,18 @@ export default function QuickActionBar() {
   const [submitted, setSubmitted] = useState(false)
   const navigate = useNavigate()
 
-  const handleCallRequest = (e) => {
+  const handleCallRequest = async (e) => {
     e.preventDefault()
     if (phone.trim()) {
+      try {
+        await fetch(`${API_BASE_URL}/api/callbacks`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: phone.trim() })
+        })
+      } catch (err) {
+        console.error('Callback error:', err)
+      }
       setSubmitted(true)
       setTimeout(() => {
         setSubmitted(false)
@@ -51,7 +61,7 @@ export default function QuickActionBar() {
           onClick={() => setQuickBookOpen(false)}
         >
           <div
-            className="bg-[#faf9f6] border border-[#cdc6ba] p-6 md:p-8 max-w-[420px] w-full custom-shadow relative"
+            className="bg-white/85 backdrop-blur-2xl border border-white/90 shadow-2xl rounded-3xl p-6 md:p-8 max-w-[420px] w-full relative"
             onClick={(e) => e.stopPropagation()}
           >
             <button

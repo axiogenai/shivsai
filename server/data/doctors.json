@@ -1,0 +1,29 @@
+[
+  {
+    "id": "doc1",
+    "name": "Dr. Anya Sharma",
+    "title": "Chief Cosmetic Dermatologist",
+    "degree": "MD (Dermatology), Fellow in Aesthetic Medicine (London)",
+    "exp": "14+ Years Clinical Practice",
+    "img": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=600",
+    "specialties": ["Laser Resurfacing", "Acne Scar Revision", "AI Skin Diagnostics"]
+  },
+  {
+    "id": "doc2",
+    "name": "Dr. Rohan Verma",
+    "title": "Senior Hair Transplant Specialist",
+    "degree": "M.Ch (Plastic Surgery), ISHRS Member",
+    "exp": "12+ Years Experience",
+    "img": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=600",
+    "specialties": ["FUE & DHI Transplants", "Scalp Micropigmentation", "PRP Growth"]
+  },
+  {
+    "id": "doc3",
+    "name": "Dr. Meera Patel",
+    "title": "Aesthetic Physician & Injector",
+    "degree": "MBBS, Diploma in Practical Dermatology (Cardiff)",
+    "exp": "9+ Years Experience",
+    "img": "https://images.unsplash.com/photo-1594824813566-78a933758f46?auto=format&fit=crop&q=80&w=600",
+    "specialties": ["Dermal Fillers", "Botox Wrinkle Care", "Bridal Aesthetics"]
+  }
+]

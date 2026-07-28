@@ -1,0 +1,38 @@
+[
+  {
+    "id": "cs1",
+    "category": "acne",
+    "title": "Acne Scar Resurfacing Protocol",
+    "subtitle": "After 4 sessions of Fractional Laser & Microneedling",
+    "protocol": "Fractional CO2 + PRP Infusion",
+    "sessions": "4 Sessions (4 weeks apart)",
+    "recovery": "2–3 Days mild redness",
+    "doctor": "Dr. Anya Sharma",
+    "beforeImg": "https://lh3.googleusercontent.com/aida-public/AB6AXuBuVdGduVCvu5ZbE-2dj69Sul-VcOet7rtn12sZrBBVzP1TsKqVA4CfJSia9YnG7k88-rfrq2ecDDnuWasAR9-p10IEp6T2UD31Vt8QKeGt7R7DNUCOT9aUskG0kpliptUlYgj-MImU0omwLU03BeeCXnc9nt3tWc5T3Y7tFAsqPC9Ub8Ni7ayhbcf5ODd91eV78KtnAirWCbctw-8P1UdnEdopxMWIl4YZuzGilz7h4jVzrwQrvxqWk1EF2zOhs_-5pXLpCuFmbTI",
+    "afterImg": "https://lh3.googleusercontent.com/aida-public/AB6AXuBOuITv_14rE8ELr-G6BWEFAtPPf1qPt-ZvAAkLmNj8N8ba4YrOkkmLohs4aaVNQ3oDnA4ZiMoawXT97WQwSpnDGviwWipp8nsNrNNuFLN9hrqDy4MR9SCxBfIwagNQH-Uc4xjytvnQkVwKdlYScucuBRzynfnOSPHKZTyeTOX_Y8aVdRiO4N6ZvmepCmoJd3ZPExk4ihN23RaHBfwjUrBLkiLJf5k3yeVMTZRzauYw9E7hJVt6OK543fg7ib-b4SB2Sjpqf1MKnmE"
+  },
+  {
+    "id": "cs2",
+    "category": "hair",
+    "title": "Advanced Hair Regrowth Protocol",
+    "subtitle": "After a 6-month advanced PRP & topical protocol",
+    "protocol": "Follicular PRP & Low-Level Laser",
+    "sessions": "6 Sessions over 6 months",
+    "recovery": "Zero Downtime",
+    "doctor": "Dr. Rohan Verma",
+    "beforeImg": "https://lh3.googleusercontent.com/aida-public/AB6AXuCCQaW2BKvkPCWYKMZDv7AmTRbwvodDErTOA8vHUsYCqJeDZWfRsCm8nqujwVIEtnv8r8syzKeH26rcRhllifWt56JJh8EWb9sBK3ctt29tkiUp2MZIEfFfyTOJ19JnMh5hdn_D3YRpyt1eAxQW6W89_ZBsgRB08evMkWM-VfjLw8BtBCOJ9JGbwVSTtT5bGVLx0y_BlXNUhc6Jw0A3WQ6unhfAde-5uSIJMZd6YsZIco1YKnJnzfDpjbwSOl22j2BNXgPtZBVbX3Y",
+    "afterImg": "https://lh3.googleusercontent.com/aida-public/AB6AXuBT7ne4EYE-E7zHeh5XmmlQ4pm51JMKNruOkzEaIa7U-4cbZOQqGFAmBW1k_oVlC8vPyinvRYLYZxT_yg6TX7CFSqVwcaP-JQYBNfSpAhr1jcnXiHPzO-dzVDkc6-uNmMbS0yXYx-CMh5xPjh6Q7bNBUrJBo1u9esHMOIsXDtABoPS7lS3Hwb3Dbmw3GZ67EJ3JeOUTSgcmAK_qkQU5trk3ded3Z3lDhqnp-h3gleaNN-ZC0Pz0NDjNuUhjAvQ3jKbqSSvpuE0j89M"
+  },
+  {
+    "id": "cs3",
+    "category": "antiaging",
+    "title": "Facial Sculpting & Volume Restoration",
+    "subtitle": "Cheek & Jawline Dermal Contour Enhancement",
+    "protocol": "Hyaluronic Acid Dermal Sculpting",
+    "sessions": "Single 45-min Session",
+    "recovery": "Immediate Results",
+    "doctor": "Dr. Meera Patel",
+    "beforeImg": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=600",
+    "afterImg": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=600"
+  }
+]
